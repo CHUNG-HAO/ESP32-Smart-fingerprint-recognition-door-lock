@@ -1,5 +1,4 @@
 # SmartFingerprintRecognitionDoorLock
-### before u start, u need:
 
 ### before start, u need:
 
