@@ -1,17 +1,17 @@
 #include <Adafruit_Fingerprint.h>
 #include <HardwareSerial.h>
 
-HardwareSerial mySerial(1); 
+HardwareSerial mySerial(1); // 使用UART1 (或你使用的任何序列端口)
 Adafruit_Fingerprint finger(&mySerial);
 
 void setup()  
 {
   Serial.begin(115200);
-  while (!Serial); 
+  while (!Serial); // 等待串行端口連接
   Serial.println("\nAdafruit 指紋傳感器測試");
 
-
-  mySerial.begin(57600, SERIAL_8N1, 16, 17); 
+  // 啟動指紋傳感器
+  mySerial.begin(57600, SERIAL_8N1, 16, 17); // 請確保這裡的引腳號與你的連接相匹配
   finger.begin(57600);
 
   if (finger.verifyPassword()) {
@@ -25,18 +25,20 @@ void setup()
   enrollFingerprint();
 }
 
-void loop()                    
+void loop()                     // 不斷循環等待指紋匹配
+{
   getFingerprintIDez();
-  delay(50);          
+  delay(50);            // 短暫延遲等待下一次讀取
 }
 
 void enrollFingerprint() {
-  int id = 1; 
+  int id = 1; // 新增指紋的ID，根據需要分配一個唯一的ID
   uint8_t p = -1;
 
   Serial.println(F("準備新增指紋..."));
   Serial.println(F("請放置手指"));
 
+  // 等待讀取手指
   while (p != FINGERPRINT_OK) {
     p = finger.getImage();
     switch (p) {
@@ -58,6 +60,7 @@ void enrollFingerprint() {
     }
   }
 
+  // 轉換圖像
   p = finger.image2Tz(1);
   switch (p) {
     case FINGERPRINT_OK:
@@ -91,7 +94,7 @@ void enrollFingerprint() {
     }
   }
 
-
+  // 轉換圖像並創建模型
   p = finger.image2Tz(2);
   p = finger.createModel();
   if (p == FINGERPRINT_OK) {
@@ -100,7 +103,8 @@ void enrollFingerprint() {
     Serial.println("錯誤創建指紋模型");
     return;
   }
-
+  
+  // 儲存指紋模型
   p = finger.storeModel(id);
   if (p == FINGERPRINT_OK) {
     Serial.println("指紋儲存成功");
